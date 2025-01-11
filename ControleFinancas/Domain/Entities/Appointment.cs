@@ -7,17 +7,26 @@ namespace AppointmentsManager.Domain.Entities
         public int Id { get; set; }
         public Doctor Doctor { get; set; }
         public Patient Patient { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime DateTimeAppointment { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }
+        public string Notes { get; set; }
         public Appointment()
         {
             
+        }
+        public Appointment(Doctor doctor, Patient patient, DateTime dateTime, AppointmentStatus appointmentStatus, string notes)
+        {
+            Doctor = doctor ?? throw new ArgumentNullException(nameof(doctor));
+            Patient = patient ?? throw new ArgumentNullException(nameof(patient));
+            DateTimeAppointment = dateTime;
+            AppointmentStatus = appointmentStatus;
+            Notes = notes;
         }
         public Appointment(Doctor doctor, Patient patient, DateTime dateTime, AppointmentStatus appointmentStatus)
         {
             Doctor = doctor ?? throw new ArgumentNullException(nameof(doctor));
             Patient = patient ?? throw new ArgumentNullException(nameof(patient));
-            DateTime = dateTime;
+            DateTimeAppointment = dateTime;
             AppointmentStatus = appointmentStatus;
         }
         public override bool Equals(object? obj)

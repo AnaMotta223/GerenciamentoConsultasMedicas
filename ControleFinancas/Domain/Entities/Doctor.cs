@@ -8,10 +8,18 @@ namespace AppointmentsManager.Domain.Entities
         public Speciality Speciality { get; set; }
         public RMC RMC { get; set; }
         public List<DateTimeWork> DateTimeWorkList { get; set; }
+        public List<Appointment> Appointments { get; set; } = new();
 
         public Doctor() { }
         public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DateTimeWork> dateTimeWorkList)
          : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
+        {
+            Speciality = speciality;
+            DateTimeWorkList = dateTimeWorkList;
+            RMC = rmc ?? throw new ArgumentNullException(nameof(rmc));
+        }
+        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DateTimeWork> dateTimeWorkList, List<Appointment> appointments)
+        : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
         {
             Speciality = speciality;
             DateTimeWorkList = dateTimeWorkList;
