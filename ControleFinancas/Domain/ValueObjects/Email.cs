@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using AppointmentsManager.Domain.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace AppointmentsManager.Domain.ValueObjects
 {
@@ -9,10 +10,10 @@ namespace AppointmentsManager.Domain.ValueObjects
         public Email(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("O email não pode ser vazio.");
+                throw new InvalidEmailException("O email não pode ser vazio.");
 
             if (!Regex.IsMatch(value, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("O email informado é inválido.");
+                throw new InvalidEmailException("O email informado é inválido.");
 
             Value = value;
         }

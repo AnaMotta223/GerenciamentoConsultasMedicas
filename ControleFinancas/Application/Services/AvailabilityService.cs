@@ -10,10 +10,9 @@ namespace AppointmentsManager.Application.Services
         {
             _appointmentRepository = appointmentRepository;
         }
-
-        public bool IsDoctorAvailable(int id, DateTime dateTimeAppointment)
+        public async Task<bool> IsDoctorAvailableAsync(int doctorId, DateTime dateTimeAppointment)
         {
-            return !_appointmentRepository.HasConflict(id, dateTimeAppointment);
+            return !await _appointmentRepository.HasConflictAsync(doctorId, dateTimeAppointment);
         }
     }
 

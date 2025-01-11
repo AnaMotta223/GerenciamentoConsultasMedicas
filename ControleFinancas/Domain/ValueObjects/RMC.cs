@@ -1,4 +1,6 @@
-﻿namespace AppointmentsManager.Domain.ValueObjects
+﻿using AppointmentsManager.Domain.Exceptions;
+
+namespace AppointmentsManager.Domain.ValueObjects
 {
     public class RMC
     {
@@ -7,10 +9,10 @@
         public RMC(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("O número do CRM não pode ser vazio.");
+                throw new InvalidRMCException("O número do CRM não pode ser vazio.");
 
             if (value.Length > 20)
-                throw new ArgumentException("O CRM deve ter no máximo 20 caracteres.");
+                throw new InvalidRMCException("O CRM deve ter no máximo 20 caracteres.");
 
             Value = value;
         }

@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Exceptions\" />
     <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\Messaging\" />
     <Folder Include="Infrastructure\Configurations\" />

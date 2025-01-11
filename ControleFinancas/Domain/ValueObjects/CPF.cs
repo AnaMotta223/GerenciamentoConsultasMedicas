@@ -1,4 +1,6 @@
-﻿namespace AppointmentsManager.Domain.ValueObjects
+﻿using AppointmentsManager.Domain.Exceptions;
+
+namespace AppointmentsManager.Domain.ValueObjects
 {
     public class CPF
     {
@@ -7,11 +9,11 @@
         public CPF(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("O CPF não pode ser vazio.");
+                throw new InvalidCPFException("O CPF não pode ser vazio.");
 
             value = value.Replace(".", "").Replace("-", ""); 
             if (value.Length != 11 || !value.All(char.IsDigit) || !IsValid(value))
-                throw new ArgumentException("O CPF informado é inválido.");
+                throw new InvalidCPFException("O CPF informado é inválido.");
 
             Value = value;
         }
