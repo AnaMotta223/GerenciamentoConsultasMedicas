@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentsManager.Presentation.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/appointments")]
     [ApiController]
     public class AppointmentController : ControllerBase
     {

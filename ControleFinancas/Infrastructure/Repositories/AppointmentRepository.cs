@@ -26,7 +26,7 @@ namespace AppointmentsManager.Infrastructure.Repositories
         }
         public async Task AddAsync(Appointment appointment)
         {
-            var query = "INSERT INTO appointment (doctor_id, patient_id, date_time_appointment, appointment_status, notes) " +
+            var query = "INSERT INTO appointment (doctor_id, patient_id, date_time, status, notes) " +
                         "VALUES (@DoctorId, @PatientId, @DateTimeAppointment, @AppointmentStatus, @Notes)";
 
             var parameters = new
@@ -41,12 +41,12 @@ namespace AppointmentsManager.Infrastructure.Repositories
         }
         public async Task UpdateAsync(int id, DateTime dateTimeAppointment, AppointmentStatus appointmentStatus, string? notes = null)
         {
-            var query = "UPDATE appointment SET date_time_appointment = @DateTimeAppointment, appointment_status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
+            var query = "UPDATE appointment SET date_time = @DateTimeAppointment, status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
             await _dbConnection.ExecuteAsync(query, new { DateTimeAppointment = dateTimeAppointment, AppointmentStatus = appointmentStatus, Notes = notes, Id = id });
         }
         public async Task UpdateStatusAsync(int id, AppointmentStatus appointmentStatus, string? notes = null)
         {
-            var query = "UPDATE appointment SET appointment_status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
+            var query = "UPDATE appointment SET status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
             await _dbConnection.ExecuteAsync(query, new { AppointmentStatus = appointmentStatus, Notes = notes, Id = id });
         }
         public async Task DeleteAsync(int id)

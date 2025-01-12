@@ -7,17 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Npgsql" Version="9.0.2" />
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\Data\" />
     <Folder Include="Infrastructure\Messaging\" />
-    <Folder Include="Infrastructure\Configurations\" />
-    <Folder Include="Tests\" />
     <Folder Include="Presentation\Models\" />
   </ItemGroup>
 
