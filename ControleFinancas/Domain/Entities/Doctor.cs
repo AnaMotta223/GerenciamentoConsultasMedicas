@@ -25,6 +25,27 @@ namespace AppointmentsManager.Domain.Entities
             DateTimeWorkList = dateTimeWorkList;
             RMC = rmc ?? throw new ArgumentNullException(nameof(rmc));
         }
+        public bool IsWithinWorkHours(DateTime appointmentDateTime)
+        {
+            var dayOfWeek = appointmentDateTime.DayOfWeek;
+
+            // Encontra os horários de trabalho para o dia da semana
+            //verificar comparacao
+            var workHours = DateTimeWorkList.FirstOrDefault(w => w.DayOfWeek == (int)dayOfWeek);
+            if (workHours == null)
+            {
+                //horarios = null -> nao trabalha
+                Console.WriteLine("o médico não trabalha nesse dia");
+                return false;
+                
+            }
+            return appointmentDateTime.TimeOfDay >= workHours.StartTime &&
+                   appointmentDateTime.TimeOfDay <= workHours.EndTime;
+        }
+        public bool HasConflict(DateTime appointmentDateTime)
+        {
+            return Appointments.Any(a => a.DateTimeAppointment == appointmentDateTime && a.AppointmentStatus != AppointmentStatus.Canceled);
+        }
         public override bool Equals(object? obj)
         {
             return obj is Doctor doctor &&

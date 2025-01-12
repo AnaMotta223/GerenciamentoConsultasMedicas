@@ -1,4 +1,5 @@
 ﻿using AppointmentsManager.Domain.Entities;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Interfaces;
 using Dapper;
 using System.Data;
@@ -7,69 +8,51 @@ namespace AppointmentsManager.Infrastructure.Repositories
 {
     public class AppointmentRepository : IAppointmentRepository
     {
-        private readonly IDbConnection _connection;
+        private readonly IDbConnection _dbConnection;
 
-        public AppointmentRepository(IDbConnection connection)
+        public AppointmentRepository(IDbConnection dbConnection)
         {
-            _connection = connection;
+            _dbConnection = dbConnection;
         }
-
-        //acabar de criar as queries
-
         public async Task<Appointment> GetByIdAsync(int id)
         {
-            var query = "SELECT * FROM Appointment WHERE Id = @Id";
-            return await _connection.QueryFirstOrDefaultAsync<Appointment>(query, new { Id = id });
+            var query = "SELECT * FROM appointment WHERE id = @Id";
+            return await _dbConnection.QuerySingleOrDefaultAsync<Appointment>(query, new { Id = id });
         }
-
+        public async Task<IEnumerable<Appointment>> GetAllAsync()
+        {
+            var query = "SELECT * FROM appointment";
+            return await _dbConnection.QueryAsync<Appointment>(query);
+        }
         public async Task AddAsync(Appointment appointment)
         {
-            var query = "INSERT INTO Appointment (DoctorId, PatientId, AppointmentDate) VALUES (@DoctorId, @PatientId, @AppointmentDate)";
-            await _connection.ExecuteAsync(query, appointment);
-        }
+            var query = "INSERT INTO appointment (doctor_id, patient_id, date_time_appointment, appointment_status, notes) " +
+                        "VALUES (@DoctorId, @PatientId, @DateTimeAppointment, @AppointmentStatus, @Notes)";
 
-        public async Task<bool> HasConflict(Doctor doctor, DateTime dateTimeAppointment)
-        {
-            var query = @"
-            SELECT COUNT(*) 
-            FROM Appointments 
-            WHERE DoctorId = @DoctorId AND DateTimeAppointment = @DateTimeAppointment";
-
-            var count = await _connection.ExecuteScalarAsync<int>(query, new
+            var parameters = new
             {
-                DoctorId = doctor.Id,  
-                DateTimeAppointment = dateTimeAppointment
-            });
-
-            return count > 0;
+                DoctorId = appointment.Doctor.Id,
+                PatientId = appointment.Patient.Id,
+                DateTimeAppointment = appointment.DateTimeAppointment,
+                AppointmentStatus = appointment.AppointmentStatus,
+                Notes = appointment.Notes
+            };
+            await _dbConnection.ExecuteAsync(query, parameters);
         }
-
-
-        Task<IEnumerable<Appointment>> IAppointmentRepository.GetAllAsync()
+        public async Task UpdateAsync(int id, DateTime dateTimeAppointment, AppointmentStatus appointmentStatus, string? notes = null)
         {
-            throw new NotImplementedException();
+            var query = "UPDATE appointment SET date_time_appointment = @DateTimeAppointment, appointment_status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
+            await _dbConnection.ExecuteAsync(query, new { DateTimeAppointment = dateTimeAppointment, AppointmentStatus = appointmentStatus, Notes = notes, Id = id });
         }
-
-        Task IAppointmentRepository.UpdateDateTimeAsync(Appointment appointment)
+        public async Task UpdateStatusAsync(int id, AppointmentStatus appointmentStatus, string? notes = null)
         {
-            throw new NotImplementedException();
+            var query = "UPDATE appointment SET appointment_status = @AppointmentStatus, notes = @Notes WHERE id = @Id";
+            await _dbConnection.ExecuteAsync(query, new { AppointmentStatus = appointmentStatus, Notes = notes, Id = id });
         }
-
-        Task IAppointmentRepository.UpdateStatusAsync(Appointment appointment)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var query = "DELETE FROM appointment WHERE id = @Id";
+            await _dbConnection.ExecuteAsync(query, new { Id = id });
         }
-
-        Task IAppointmentRepository.DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        //Task<Appointment> IAppointmentRepository.GetByIdAsync(int id)
-        //{
-        //    var query = "SELECT * FROM Appointments WHERE Id = @Id";
-        //    return _connection.QueryFirstOrDefaultAsync<Appointment>(query, new { Id = id });
-        //}
-
     }
 }

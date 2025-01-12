@@ -11,6 +11,5 @@ namespace AppointmentsManager.Domain.Interfaces
         Task UpdateAsync(int id, DateTime newDateTime, AppointmentStatus newStatus, string? notes = null);
         Task UpdateStatusAsync(int id, AppointmentStatus newStatus, string? notes = null);
         Task DeleteAsync(int id);
-        Task<bool> HasConflictAsync(int doctorId, DateTime dateTimeAppointment);
     }
 }
