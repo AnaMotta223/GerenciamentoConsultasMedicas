@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Infrastructure\Messaging\" />
-    <Folder Include="Presentation\Models\" />
   </ItemGroup>
 
 </Project>

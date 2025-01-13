@@ -33,12 +33,34 @@ namespace AppointmentsManager.Application.Services
             return new AppointmentResponseDTO
             {
                 Id = appointment.Id,
-                DoctorId = appointment.Doctor.Id,
-                PatientId = appointment.Patient.Id,
+                DoctorName = appointment.Doctor.Name,
+                DoctorLastName = appointment.Doctor.LastName,
+                PatientName = appointment.Patient.Name,
+                PatientLastName = appointment.Patient.LastName,
                 DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                 AppointmentStatus = appointment.AppointmentStatus,
                 Notes = appointment.Notes
             };
+        }
+        public async Task<IEnumerable<AppointmentResponseDTO>> SearchAppointmentsByDateAsync(int id)
+        {
+            var appointments = await _appointmentRepository.GetAllAsync();
+
+            if (appointments == null)
+            {
+                throw new KeyNotFoundException("Não há consultas cadastras.");
+            }
+            return appointments?.Select(appointment => new AppointmentResponseDTO
+            {
+                Id = appointment.Id,
+                DoctorName = appointment.Doctor.Name,
+                DoctorLastName = appointment.Doctor.LastName,
+                PatientName = appointment.Patient.Name,
+                PatientLastName = appointment.Patient.LastName,
+                DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
+                AppointmentStatus = appointment.AppointmentStatus,
+                Notes = appointment.Notes
+            }) ?? new List<AppointmentResponseDTO>();
         }
         public async Task<IEnumerable<AppointmentResponseDTO>> ListAppointmentsAsync()
         {
@@ -49,8 +71,10 @@ namespace AppointmentsManager.Application.Services
                 return appointments?.Select(appointment => new AppointmentResponseDTO
                 {
                     Id = appointment.Id,
-                    DoctorId = appointment.Doctor.Id,
-                    PatientId = appointment.Patient.Id,
+                    DoctorName = appointment.Doctor.Name,
+                    DoctorLastName = appointment.Doctor.LastName,
+                    PatientName = appointment.Patient.Name,
+                    PatientLastName = appointment.Patient.LastName,
                     DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                     AppointmentStatus = appointment.AppointmentStatus,
                     Notes = appointment.Notes
@@ -108,8 +132,10 @@ namespace AppointmentsManager.Application.Services
             var appointmentDto = new AppointmentResponseDTO
             {
                 Id = appointment.Id,
-                DoctorId = appointment.Doctor.Id,
-                PatientId = appointment.Patient.Id,
+                DoctorName = appointment.Doctor.Name,
+                DoctorLastName = appointment.Doctor.LastName,
+                PatientName = appointment.Patient.Name,
+                PatientLastName = appointment.Patient.LastName,
                 DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                 AppointmentStatus = appointment.AppointmentStatus,
                 Notes = appointment.Notes
@@ -144,8 +170,10 @@ namespace AppointmentsManager.Application.Services
                 return new AppointmentResponseDTO
                 {
                     Id = appointment.Id,
-                    DoctorId = appointment.Doctor.Id,
-                    PatientId = appointment.Patient.Id,
+                    DoctorName = appointment.Doctor.Name,
+                    DoctorLastName = appointment.Doctor.LastName,
+                    PatientName = appointment.Patient.Name,
+                    PatientLastName = appointment.Patient.LastName,
                     DateTimeAppointment = updateAppointmentDTO.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                     AppointmentStatus = updateAppointmentDTO.AppointmentStatus,
                     Notes = appointment.Notes
@@ -158,8 +186,10 @@ namespace AppointmentsManager.Application.Services
             return new AppointmentResponseDTO
             {
                 Id = appointment.Id,
-                DoctorId = appointment.Doctor.Id,
-                PatientId = appointment.Patient.Id,
+                DoctorName = appointment.Doctor.Name,
+                DoctorLastName = appointment.Doctor.LastName,
+                PatientName = appointment.Patient.Name,
+                PatientLastName = appointment.Patient.LastName,
                 DateTimeAppointment = updateAppointmentDTO.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                 AppointmentStatus = updateAppointmentDTO.AppointmentStatus,
                 Notes = updateAppointmentDTO.Notes
@@ -179,8 +209,10 @@ namespace AppointmentsManager.Application.Services
                 return new AppointmentResponseDTO
                 {
                     Id = appointment.Id,
-                    DoctorId = appointment.Doctor.Id,
-                    PatientId = appointment.Patient.Id,
+                    DoctorName = appointment.Doctor.Name,
+                    DoctorLastName = appointment.Doctor.LastName,
+                    PatientName = appointment.Patient.Name,
+                    PatientLastName = appointment.Patient.LastName,
                     DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                     AppointmentStatus = updateStatusAppointmentDTO.Status,
                     Notes = appointment.Notes
@@ -192,8 +224,10 @@ namespace AppointmentsManager.Application.Services
             return new AppointmentResponseDTO
             {
                 Id = appointment.Id,
-                DoctorId = appointment.Doctor.Id,
-                PatientId = appointment.Patient.Id,
+                DoctorName = appointment.Doctor.Name,
+                DoctorLastName = appointment.Doctor.LastName,
+                PatientName = appointment.Patient.Name,
+                PatientLastName = appointment.Patient.LastName,
                 DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm:ss"),
                 AppointmentStatus = updateStatusAppointmentDTO.Status,
                 Notes = updateStatusAppointmentDTO.Notes

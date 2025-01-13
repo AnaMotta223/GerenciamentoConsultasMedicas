@@ -1,5 +1,8 @@
 ﻿using AppointmentsManager.Domain.Entities;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Interfaces;
+using AppointmentsManager.Domain.ValueObjects;
+using Dapper;
 using System.Data;
 
 namespace AppointmentsManager.Infrastructure.Repositories
@@ -12,30 +15,56 @@ namespace AppointmentsManager.Infrastructure.Repositories
         {
             _dbConnection = dbConnection;
         }
-
-        Task IPatientRepository.AddAsync(Patient patient)
+        public async Task<IEnumerable<Patient>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var query = "SELECT * FROM patient";
+            return await _dbConnection.QueryAsync<Patient>(query);
         }
-
-        Task IPatientRepository.DeleteAsync(int id)
+        public async Task<Patient> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var query = "SELECT * FROM patient WHERE id = @Id";
+            return await _dbConnection.QuerySingleOrDefaultAsync<Patient>(query, new { Id = id });
         }
-
-        Task<IEnumerable<Patient>> IPatientRepository.GetAllAsync()
+        public async Task AddAsync(Patient patient)
         {
-            throw new NotImplementedException();
+            var query = "INSERT INTO patient (name, last_name, email, password, phone, address, birth_date, gender, cpf) " +
+                       "VALUES (@Name, @LastName, @Email, @Password, @Phone, @Address, @BirthDate, @Gender, @CPF) RETURNING id;";
+
+            var parameters = new
+            {
+                Name = patient.Name,
+                LastName = patient.LastName,
+                Email = patient.Email,
+                Password = patient.Password,
+                Phone = patient.Phone,
+                Address = patient.Address,
+                BirthDate = patient.BirthDate,
+                Gender = (int)patient.Gender,
+                CPF = patient.CPF,
+            };
+            var id = await _dbConnection.QuerySingleAsync<int>(query, parameters);
         }
-
-        Task<Patient> IPatientRepository.GetByIdAsync(int id)
+        public async Task UpdateAsync(int id, string newName, string newLastName, string newPassword, string newAddress, DateTime newBirthDate, Gender newGender, Email newEmail, string newPhone)
         {
-            throw new NotImplementedException();
+            var query = "UPDATE patient SET name = @Name, last_name = @LastName, password = @Password, address = @Address, birth_date = @BirthDate, gender = @Gender, email = @Email, phone = @Phone WHERE id = @Id";
+
+            await _dbConnection.ExecuteAsync(query, new
+            {
+                Name = newName,
+                LastName = newLastName,
+                Password = newPassword,
+                Address = newAddress,
+                BirthDate = newBirthDate,
+                Gender = (int)newGender,
+                Email = newEmail,
+                Phone = newPhone,
+                Id = id
+            });
         }
-
-        Task IPatientRepository.UpdateAsync(Patient patient)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var query = "DELETE FROM patient WHERE id = @Id";
+            await _dbConnection.ExecuteAsync(query, new { Id = id });
         }
     }
 }

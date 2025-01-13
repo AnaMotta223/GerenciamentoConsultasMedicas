@@ -3,7 +3,7 @@ using AppointmentsManager.Domain.ValueObjects;
 
 namespace AppointmentsManager.Application.DTOs
 {
-    public class UpdateDoctorDTO
+    public class UpdatePatientDTO
     {
         public string Name { get; set; }
         public string LastName { get; set; }
@@ -13,7 +13,5 @@ namespace AppointmentsManager.Application.DTOs
         public Gender Gender { get; set; }
         public Email Email { get; set; }
         public string Phone { get; set; }
-        public RMC RMC { get; set; }
-        public Speciality Speciality { get; set; }
     }
 }

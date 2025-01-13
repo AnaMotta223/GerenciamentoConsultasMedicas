@@ -1,6 +1,4 @@
-﻿using AppointmentsManager.Domain.Enums;
-
-namespace AppointmentsManager.Application.DTOs
+﻿namespace AppointmentsManager.Application.DTOs
 {
     public class CreateAppointmentDTO
     {

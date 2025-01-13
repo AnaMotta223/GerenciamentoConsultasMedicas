@@ -5,12 +5,15 @@ using AppointmentsManager.Infrastructure.Repositories;
 using Npgsql;
 using System.Data;
 using Microsoft.OpenApi.Models;
-using BCrypt.Net;
 using AppointmentsManager.Utils;
+using AppointmentsManager.Domain.ValueObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+Dapper.SqlMapper.AddTypeHandler(new EmailTypeHandler());
+Dapper.SqlMapper.AddTypeHandler(new CPFTypeHandler());
+Dapper.SqlMapper.AddTypeHandler(new RMCTypeHandler());
 builder.Services.AddSingleton<PasswordEncrypter>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -34,6 +37,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<DoctorService>();
+builder.Services.AddScoped<PatientService>();
 builder.Services.AddScoped<AvailabilityService>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();

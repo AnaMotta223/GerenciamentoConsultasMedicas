@@ -1,6 +1,6 @@
-﻿using AppointmentsManager.Application.DTOs;
-using AppointmentsManager.Application.Services;
+﻿using AppointmentsManager.Application.Services;
 using AppointmentsManager.Domain.Exceptions;
+using AppointmentsManager.Presentation.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentsManager.Presentation.Controllers
@@ -40,7 +40,7 @@ namespace AppointmentsManager.Presentation.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -49,11 +49,12 @@ namespace AppointmentsManager.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDTO createAppointmentDTO)
+        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentModel createAppointmentModel)
         {
             try
             {
-                var appointment = await _appointmentService.ScheduleAppointmentAsync(createAppointmentDTO);
+                var appointmentDto = createAppointmentModel.ToDto();
+                var appointment = await _appointmentService.ScheduleAppointmentAsync(appointmentDto);
                 return CreatedAtAction(nameof(GetAppointment), new { id = appointment.Id }, appointment);
             }
             catch (InvalidDateTimeException ex)
@@ -71,11 +72,12 @@ namespace AppointmentsManager.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAppointment(int id, [FromBody] UpdateAppointmentDTO updateAppointmentDTO)
+        public async Task<IActionResult> UpdateAppointment(int id, [FromBody] UpdateAppointmentModel updateAppointmentModel)
         {
             try
             {
-                var appointment = await _appointmentService.UpdateAppointmentAsync(id, updateAppointmentDTO);
+                var appointmentDto = updateAppointmentModel.ToDto();
+                var appointment = await _appointmentService.UpdateAppointmentAsync(id, appointmentDto);
                 return Ok(appointment);
             }
             catch (InvalidDateTimeException ex)
@@ -93,11 +95,12 @@ namespace AppointmentsManager.Presentation.Controllers
         }
 
         [HttpPut("status/{id}")]
-        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateStatusAppointmentDTO updateStatusAppointmentDTO)
+        public async Task<IActionResult> UpdateAppointmentStatus(int id, [FromBody] UpdateStatusAppointmentModel updateStatusAppointmentModel)
         {
             try
             {
-                var appointment = await _appointmentService.UpdateAppointmentStatusAsync(id, updateStatusAppointmentDTO);
+                var appointmentDto = updateStatusAppointmentModel.ToDto();
+                var appointment = await _appointmentService.UpdateAppointmentStatusAsync(id, appointmentDto);
                 return Ok(appointment);
             }
             catch (ArgumentException ex)

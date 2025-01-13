@@ -1,8 +1,8 @@
 ﻿using AppointmentsManager.Domain.Enums;
 
-namespace AppointmentsManager.Application.DTOs
+namespace AppointmentsManager.Presentation.Models
 {
-    public class AppointmentResponseDTO
+    public class AppointmentResponseModel
     {
         public int Id { get; set; }
         public string DoctorName { get; set; }

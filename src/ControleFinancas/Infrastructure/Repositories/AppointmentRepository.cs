@@ -19,6 +19,11 @@ namespace AppointmentsManager.Infrastructure.Repositories
             var query = "SELECT * FROM appointment WHERE id = @Id";
             return await _dbConnection.QuerySingleOrDefaultAsync<Appointment>(query, new { Id = id });
         }
+        public async Task<Appointment> GetByDateTimeAsync(DateTime dateTime)
+        {
+            var query = "SELECT * FROM appointment WHERE date_time = @DateTime";
+            return await _dbConnection.QuerySingleOrDefaultAsync<Appointment>(query, new { DateTime = dateTime });
+        }
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
             var query = "SELECT * FROM appointment";

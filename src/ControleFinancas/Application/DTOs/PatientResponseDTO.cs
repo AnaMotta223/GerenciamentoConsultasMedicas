@@ -3,17 +3,15 @@ using AppointmentsManager.Domain.ValueObjects;
 
 namespace AppointmentsManager.Application.DTOs
 {
-    public class UpdateDoctorDTO
+    public class PatientResponseDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
-        public string Password { get; set; }
-        public string Address { get; set; }
-        public DateTime BirthDate { get; set; }
-        public Gender Gender { get; set; }
         public Email Email { get; set; }
         public string Phone { get; set; }
-        public RMC RMC { get; set; }
-        public Speciality Speciality { get; set; }
+        public string Address { get; set; }
+        public string BirthDate { get; set; }
+        public Gender Gender { get; set; }
     }
 }
