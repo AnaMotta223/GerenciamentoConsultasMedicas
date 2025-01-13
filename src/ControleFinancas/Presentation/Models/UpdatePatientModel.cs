@@ -1,5 +1,6 @@
 ﻿using AppointmentsManager.Application.DTOs;
 using AppointmentsManager.Domain.Enums;
+using AppointmentsManager.Domain.ValueObjects;
 
 namespace AppointmentsManager.Presentation.Models
 {
@@ -11,7 +12,7 @@ namespace AppointmentsManager.Presentation.Models
         public string Address { get; set; }
         public DateTime BirthDate { get; set; }
         public Gender Gender { get; set; }
-        public string Email { get; set; }
+        public Email Email { get; set; }
         public string Phone { get; set; }
 
         public UpdatePatientDTO ToDto()
