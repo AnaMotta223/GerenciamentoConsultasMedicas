@@ -1,4 +1,5 @@
-﻿using AppointmentsManager.Domain.Enums;
+﻿using AppointmentsManager.Application.DTOs;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.ValueObjects;
 
 namespace AppointmentsManager.Domain.Entities
@@ -7,43 +8,39 @@ namespace AppointmentsManager.Domain.Entities
     {
         public Speciality Speciality { get; set; }
         public RMC RMC { get; set; }
-        public List<DateTimeWork> DateTimeWorkList { get; set; }
+        public List<DoctorDateTimeWorkResponseDTO> DateTimeWorkList { get; set; } = new();
         public List<Appointment> Appointments { get; set; } = new();
-
         public Doctor() { }
-        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DateTimeWork> dateTimeWorkList)
+        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList)
          : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
         {
+            RMC = rmc;
             Speciality = speciality;
             DateTimeWorkList = dateTimeWorkList;
-            RMC = rmc ?? throw new ArgumentNullException(nameof(rmc));
         }
-        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DateTimeWork> dateTimeWorkList, List<Appointment> appointments)
+        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList, List<Appointment> appointments)
         : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
         {
             Speciality = speciality;
-            DateTimeWorkList = dateTimeWorkList;
-            RMC = rmc ?? throw new ArgumentNullException(nameof(rmc));
+           DateTimeWorkList = dateTimeWorkList;
         }
-        public bool IsWithinWorkHours(DateTime appointmentDateTime)
+        public bool IsWithinWorkHours(DateTime appointmentDateTime, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList)
         {
+            DateTimeWorkList = dateTimeWorkList;
             var dayOfWeek = appointmentDateTime.DayOfWeek;
 
-            // Encontra os horários de trabalho para o dia da semana
-            //verificar comparacao
             var workHours = DateTimeWorkList.FirstOrDefault(w => w.DayOfWeek == (int)dayOfWeek);
             if (workHours == null)
             {
-                //horarios = null -> nao trabalha
-                Console.WriteLine("o médico não trabalha nesse dia");
                 return false;
                 
             }
-            return appointmentDateTime.TimeOfDay >= workHours.StartTime &&
-                   appointmentDateTime.TimeOfDay <= workHours.EndTime;
+            return appointmentDateTime.TimeOfDay >= workHours.StartTime.ToTimeSpan() &&
+                   appointmentDateTime.TimeOfDay <= workHours.EndTime.ToTimeSpan();
         }
-        public bool HasConflict(DateTime appointmentDateTime)
+        public bool HasConflict(DateTime appointmentDateTime, List<Appointment> appointments)
         {
+            Appointments = appointments;
             return Appointments.Any(a => a.DateTimeAppointment == appointmentDateTime && a.AppointmentStatus != AppointmentStatus.CANCELED);
         }
         public override bool Equals(object? obj)

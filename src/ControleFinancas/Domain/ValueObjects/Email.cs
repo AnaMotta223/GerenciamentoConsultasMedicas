@@ -1,4 +1,5 @@
 ﻿using AppointmentsManager.Domain.Exceptions;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace AppointmentsManager.Domain.ValueObjects
@@ -17,6 +18,7 @@ namespace AppointmentsManager.Domain.ValueObjects
 
             Value = value;
         }
+        public override string ToString() => Value;
         public override bool Equals(object obj)
             => obj is Email other && Value == other.Value;
 

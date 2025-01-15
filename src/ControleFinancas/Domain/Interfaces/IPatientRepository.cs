@@ -6,6 +6,8 @@ namespace AppointmentsManager.Domain.Interfaces
 {
     public interface IPatientRepository
     {
+        Task<bool> ExistsByCPFAsync(string cpf);
+        Task<bool> ExistsByEmailAsync(string email);
         Task<Patient> GetByIdAsync(int id);
         Task<IEnumerable<Patient>> GetAllAsync();
         Task AddAsync(Patient patient);

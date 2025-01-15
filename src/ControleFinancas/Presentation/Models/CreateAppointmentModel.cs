@@ -1,4 +1,5 @@
 ﻿using AppointmentsManager.Application.DTOs;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace AppointmentsManager.Presentation.Models
 {
@@ -6,8 +7,9 @@ namespace AppointmentsManager.Presentation.Models
     {
         public int DoctorId { get; set; }
         public int PatientId { get; set; }
-        public DateTime DateTimeAppointment { get; set; }
 
+        [SwaggerSchema(Format = "date-time", Description = "Data e hora da consulta no formato dd/MM/yyyy HH:mm")]
+        public string DateTimeAppointment { get; set; }
         public CreateAppointmentDTO ToDto()
         {
             return new CreateAppointmentDTO

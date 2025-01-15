@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentsManager.Presentation.Controllers
 {
-    [Route("api/appointments")]
+    [Route("api/doctors")]
     [ApiController]
     public class DoctorController : ControllerBase
     {
@@ -47,6 +47,23 @@ namespace AppointmentsManager.Presentation.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
             }
         }
+        [HttpGet("schedule/{id}")]
+        public async Task<IActionResult> GetDoctorSchedule(int id)
+        {
+            try
+            {
+                var doctor = await _doctorService.GetDoctorScheduleAsync(id);
+                return Ok(doctor);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateDoctor([FromBody] CreateDoctorModel createDoctorModel)
@@ -74,6 +91,40 @@ namespace AppointmentsManager.Presentation.Controllers
             {
                 var doctorDto = updateDoctorModel.ToDto();
                 var doctor = await _doctorService.UpdateDoctorAsync(id, doctorDto);
+                return Ok(doctor);
+            }
+            catch (InvalidDateTimeException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidEmailException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidCPFException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidRMCException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
+            }
+        }
+        [HttpPut("schedule/{id}")]
+        public async Task<IActionResult> UpdateDoctorSchedule(int id, [FromBody] IEnumerable<UpdateDoctorScheduleModel> updateDoctorScheduleModel)
+        {
+            try
+            {
+                var doctorDto = updateDoctorScheduleModel.Select(s => s.ToDto());
+                var doctor = await _doctorService.UpdateDoctorScheduleAsync(id, doctorDto);
                 return Ok(doctor);
             }
             catch (InvalidDateTimeException ex)

@@ -5,8 +5,8 @@ namespace AppointmentsManager.Domain.Entities
     public class Appointment
     {
         public int Id { get; set; }
-        public Doctor Doctor { get; set; }
-        public Patient Patient { get; set; }
+        public int DoctorId { get; set; }
+        public int PatientId { get; set; }
         public DateTime DateTimeAppointment { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }
         public string Notes { get; set; }
@@ -14,22 +14,23 @@ namespace AppointmentsManager.Domain.Entities
         {
             
         }
-        public Appointment(Doctor doctor, Patient patient, DateTime dateTime, AppointmentStatus appointmentStatus, string notes)
+        public Appointment(int doctorId, int patientId, DateTime dateTime, AppointmentStatus appointmentStatus, string notes)
         {
-            Doctor = doctor ?? throw new ArgumentNullException(nameof(doctor));
-            Patient = patient ?? throw new ArgumentNullException(nameof(patient));
+            DoctorId = doctorId; 
+            PatientId = patientId;
             DateTimeAppointment = dateTime;
             AppointmentStatus = appointmentStatus;
             Notes = notes;
         }
-        public Appointment(Doctor doctor, Patient patient, DateTime dateTime, AppointmentStatus appointmentStatus)
+
+        public Appointment(int doctorId, int patientId, DateTime dateTime, AppointmentStatus appointmentStatus)
         {
-            Doctor = doctor ?? throw new ArgumentNullException(nameof(doctor));
-            Patient = patient ?? throw new ArgumentNullException(nameof(patient));
+            DoctorId = doctorId;
+            PatientId = patientId;
             DateTimeAppointment = dateTime;
             AppointmentStatus = appointmentStatus;
         }
-        public override bool Equals(object? obj)
+       public override bool Equals(object? obj)
         {
             return obj is Appointment appointment &&
                    Id == appointment.Id;

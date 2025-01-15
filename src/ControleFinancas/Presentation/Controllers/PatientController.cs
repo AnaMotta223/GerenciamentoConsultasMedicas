@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentsManager.Presentation.Controllers
 {
-    [Route("api/appointments")]
+    [Route("api/patients")]
     [ApiController]
     public class PatientController : ControllerBase
     {
@@ -85,10 +85,6 @@ namespace AppointmentsManager.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
             catch (InvalidCPFException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (InvalidRMCException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }

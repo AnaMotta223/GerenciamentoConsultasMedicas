@@ -11,15 +11,17 @@ namespace AppointmentsManager.Domain.ValueObjects
             if (string.IsNullOrWhiteSpace(value))
                 throw new InvalidRMCException("O número do CRM não pode ser vazio.");
 
-            if (value.Length > 20)
-                throw new InvalidRMCException("O CRM deve ter no máximo 20 caracteres.");
+            if (value.Length != 9)
+                throw new InvalidRMCException("CRM inválido. Deve conter exatamente 9 dígitos.");
 
             Value = value;
         }
+
         public override bool Equals(object obj)
             => obj is RMC other && Value == other.Value;
 
         public override int GetHashCode() => Value.GetHashCode();
-    }
 
+        public override string ToString() => Value.ToString();
+    }
 }

@@ -1,7 +1,7 @@
 ﻿namespace AppointmentsManager.Domain.Exceptions
 {
-    public class InvalidCPFException : ArgumentException
+    public class InvalidEmailException : ArgumentException
     {
-        public InvalidCPFException(string message) : base(message) { }
+        public InvalidEmailException(string message) : base(message) { }
     }
 }

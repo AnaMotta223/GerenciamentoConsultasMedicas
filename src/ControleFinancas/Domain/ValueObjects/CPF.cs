@@ -17,7 +17,7 @@ namespace AppointmentsManager.Domain.ValueObjects
 
             Value = value;
         }
-
+        public override string ToString() => Value;
         private bool IsValid(string cpf)
         {
             int[] multipliers1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };

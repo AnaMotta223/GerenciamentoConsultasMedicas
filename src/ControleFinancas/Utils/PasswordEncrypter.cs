@@ -2,9 +2,11 @@
 {
     public class PasswordEncrypter
     {
+        private const int SaltRounds = 12;
         public string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            var salt = BCrypt.Net.BCrypt.GenerateSalt(SaltRounds);
+            return BCrypt.Net.BCrypt.HashPassword(password, salt);
         }
         public bool VerifyPassword(string password, string hashedPassword)
         {

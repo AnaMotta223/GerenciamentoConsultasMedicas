@@ -47,6 +47,40 @@ namespace AppointmentsManager.Presentation.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
             }
         }
+        [HttpGet("date")]
+        public async Task<IActionResult> SearchAppointmentsByDateAsync(DateTime dateTime)
+        {
+            try
+            {
+                var appointments = await _appointmentService.SearchAppointmentsByDateAsync(dateTime);
+                return Ok(appointments);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
+            }
+        }
+        [HttpGet("availability/{id}")]
+        public async Task<IActionResult> IsDoctorAvailableAsync(int id, DateTime appointmentDateTime)
+        {
+            try
+            {
+                bool isAvailable = await _appointmentService.IsDoctorAvailableAsync(id, appointmentDateTime);
+                return Ok(isAvailable);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentModel createAppointmentModel)

@@ -2,7 +2,8 @@
 {
     public class DateTimeWork
     {
-        public Doctor Doctor { get; set; }
+        public int Id { get; set; }
+        public int IdDoctor { get; set; }
         public int DayOfWeek { get; set; } // 1-7 (Seg-Sáb)
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
@@ -10,25 +11,13 @@
         public DateTimeWork() { }
         public DateTimeWork(int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
         {
-            if (dayOfWeek < 1 || dayOfWeek > 7)
-                throw new ArgumentException("O dia da semana deve estar entre 1 e 7.");
-
-            if (startTime >= endTime)
-                throw new ArgumentException("O horário de início deve ser anterior ao horário de fim.");
-
             DayOfWeek = dayOfWeek;
             StartTime = startTime;
             EndTime = endTime;
         }
-        public DateTimeWork(Doctor doctor, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
+        public DateTimeWork(int idDoctor, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
         {
-            if (dayOfWeek < 1 || dayOfWeek > 7)
-                throw new ArgumentException("O dia da semana deve estar entre 1 e 7.");
-
-            if (startTime >= endTime)
-                throw new ArgumentException("O horário de início deve ser anterior ao horário de fim.");
-
-            Doctor = doctor;
+            IdDoctor = idDoctor;
             DayOfWeek = dayOfWeek;
             StartTime = startTime;
             EndTime = endTime;
@@ -46,14 +35,6 @@
                 7 => "Sábado",
                 _ => throw new ArgumentException("Dia da semana inválido.")
             };
-        }
-        public string GetFormattedStartTime()
-        {
-            return StartTime.ToString(@"hh\:mm");
-        }
-        public string GetFormattedEndTime()
-        {
-            return EndTime.ToString(@"hh\:mm");
         }
     }
 }

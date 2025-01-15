@@ -16,94 +16,65 @@ namespace AppointmentsManager.Application.Services
             _patientRepository = patientRepository;
             _passwordEncrypter = passwordEncrypter;
         }
-        public async Task<IEnumerable<PatientResponseDTO>> ListPatientsAsync()
+        private static PatientResponseDTO MapToPatientResponseDTO(Patient patient)
         {
-            try
-            {
-                var patients = await _patientRepository.GetAllAsync();
-
-                return patients?.Select(patient => new PatientResponseDTO
-                {
-                    Id = patient.Id,
-                    Name = patient.Name,
-                    LastName = patient.LastName,
-                    Email = patient.Email,
-                    Phone = patient.Phone,
-                    Address = patient.Address,
-                    BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
-                    Gender = patient.Gender
-                }) ?? new List<PatientResponseDTO>();
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException("Ocorreu um erro ao listar os pacientes.", ex);
-            }
-        }
-        public async Task<PatientResponseDTO> SearchPatientAsync(int id)
-        {
-            var patient = await _patientRepository.GetByIdAsync(id);
-
-            if (patient == null)
-            {
-                throw new KeyNotFoundException($"Nenhum paciente encontrado com o ID {id}.");
-            }
-
             return new PatientResponseDTO
             {
                 Id = patient.Id,
                 Name = patient.Name,
                 LastName = patient.LastName,
-                Email = patient.Email,
+                Email = patient.Email.ToString(),
                 Phone = patient.Phone,
                 Address = patient.Address,
                 BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
                 Gender = patient.Gender
             };
         }
-        public async Task<PatientResponseDTO> RegisterPatientAsync(CreatePatientDTO createPatientDTO)
+        public async Task<IEnumerable<PatientResponseDTO>> ListPatientsAsync()
         {
             var patients = await _patientRepository.GetAllAsync();
-
-            if (createPatientDTO.BirthDate >= DateTime.Now)
+            return patients.Select(patient => MapToPatientResponseDTO(patient));
+        }
+        public async Task<PatientResponseDTO> SearchPatientAsync(int id)
+        {
+            var patient = await _patientRepository.GetByIdAsync(id)
+                          ?? throw new KeyNotFoundException($"Nenhum paciente encontrado com o ID {id}.");
+            return MapToPatientResponseDTO(patient);
+        }
+        public async Task<PatientResponseDTO> RegisterPatientAsync(CreatePatientDTO createPatientDTO)
+        {
+            if (createPatientDTO.Phone.Length < 8)
             {
+                throw new InvalidPhoneException("Número de telefone inválido.");
+            }
+            if (((int)createPatientDTO.Gender) < 0 || ((int)createPatientDTO.Gender) > 3)
+            {
+                throw new InvalidEnumNumberException("Gênero inválido. Valor não encontrado.");
+            }
+            if (createPatientDTO.BirthDate.ToDateTime() >= DateTime.Now)
                 throw new InvalidDateTimeException("Data de nascimento inválida.");
-            }
-            if (patients.Any(a => a.CPF.Equals(createPatientDTO.CPF)))
-            {
+
+            if (await _patientRepository.ExistsByCPFAsync(createPatientDTO.CPF))
                 throw new InvalidCPFException("CPF já cadastrado.");
-            }
-            if (patients.Any(a => a.Email.Equals(createPatientDTO.Email)))
-            {
+
+            if (await _patientRepository.ExistsByEmailAsync(createPatientDTO.Email))
                 throw new InvalidEmailException("Email já cadastrado.");
-            }
+            
             var patient = new Patient
             {
                 Name = createPatientDTO.Name,
                 LastName = createPatientDTO.LastName,
-                Email = createPatientDTO.Email,
+                Email = createPatientDTO.Email.ToEmail(),
                 Password = _passwordEncrypter.HashPassword(createPatientDTO.Password),
                 Phone = createPatientDTO.Phone,
                 Address = createPatientDTO.Address,
-                BirthDate = createPatientDTO.BirthDate,
+                BirthDate = createPatientDTO.BirthDate.ToDateTime(),
                 Gender = createPatientDTO.Gender,
-                CPF = createPatientDTO.CPF
+                CPF = createPatientDTO.CPF.ToCPF()
             };
 
             await _patientRepository.AddAsync(patient);
-
-            var patientDto = new PatientResponseDTO
-            {
-                Id = patient.Id,
-                Name = patient.Name,
-                LastName = patient.LastName,
-                Email = patient.Email,
-                Phone = patient.Phone,
-                Address = patient.Address,
-                BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
-                Gender = patient.Gender
-            };
-
-            return patientDto;
+            return MapToPatientResponseDTO(patient);
         }
         public async Task<PatientResponseDTO> UpdatePatientAsync(int id, UpdatePatientDTO updatePatientDTO)
         {
@@ -114,11 +85,19 @@ namespace AppointmentsManager.Application.Services
             {
                 throw new ArgumentException("Paciente não encontrado.");
             }
-            if (updatePatientDTO.BirthDate >= DateTime.Now)
+            if (updatePatientDTO.Phone.Length < 8)
+            {
+                throw new InvalidPhoneException("Número de telefone inválido.");
+            }
+            if (((int)updatePatientDTO.Gender) < 0 || ((int)updatePatientDTO.Gender) > 3)
+            {
+                throw new InvalidEnumNumberException("Gênero inválido. Valor não encontrado.");
+            }
+            if (updatePatientDTO.BirthDate.ToDateTime() >= DateTime.Now)
             {
                 throw new InvalidDateTimeException("Data de nascimento inválida.");
             }
-            if (patients.Any(a => a.Email.Equals(updatePatientDTO.Email)))
+            if (patients.Any(p => p.Email.Equals(updatePatientDTO.Email)))
             {
                 throw new InvalidEmailException("Email já cadastrado.");
             }
@@ -126,16 +105,17 @@ namespace AppointmentsManager.Application.Services
                 updatePatientDTO.LastName,
                 _passwordEncrypter.HashPassword(updatePatientDTO.Password),
                 updatePatientDTO.Address,
-                updatePatientDTO.BirthDate,
+                updatePatientDTO.BirthDate.ToDateTime(),
                 updatePatientDTO.Gender,
-                updatePatientDTO.Email,
+                updatePatientDTO.Email.ToEmail(),
                 updatePatientDTO.Phone);
+
             return new PatientResponseDTO
             {
                 Id = patient.Id,
                 Name = patient.Name,
                 LastName = patient.LastName,
-                Email = patient.Email,
+                Email = patient.Email.ToString(),
                 Phone = patient.Phone,
                 Address = patient.Address,
                 BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
