@@ -42,11 +42,12 @@ namespace AppointmentsManager.Infrastructure.Repositories
         public async Task AddAsync(Patient patient)
         {
             using var connection = _databaseConfig.GetConnection();
-            var query = "INSERT INTO patient (name, last_name, email, password, phone, address, birth_date, gender, cpf) " +
-                        "VALUES (@Name, @LastName, @Email, @Password, @Phone, @Address, @BirthDate, @Gender, @CPF) RETURNING id;";
+            var query = "INSERT INTO patient (status, name, last_name, email, password, phone, address, birth_date, gender, cpf) " +
+                        "VALUES (@Status, @Name, @LastName, @Email, @Password, @Phone, @Address, @BirthDate, @Gender, @CPF) RETURNING id;";
 
             var parameters = new
             {
+                Status = patient.Status,
                 Name = patient.Name,
                 LastName = patient.LastName,
                 Email = patient.Email,
@@ -59,29 +60,29 @@ namespace AppointmentsManager.Infrastructure.Repositories
             };
             patient.Id = await connection.ExecuteScalarAsync<int>(query, parameters);
         }
-        public async Task UpdateAsync(int id, string newName, string newLastName, string newPassword, string newAddress, DateTime newBirthDate, Gender newGender, Email newEmail, string newPhone)
+        public async Task UpdateAsync(int id, string newName, string newLastName, string newAddress, DateTime newBirthDate, Gender newGender, CPF newCPF, Email newEmail, string newPhone)
         {
             using var connection = _databaseConfig.GetConnection();
-            var query = "UPDATE patient SET name = @Name, last_name = @LastName, password = @Password, address = @Address, birth_date = @BirthDate, gender = @Gender, email = @Email, phone = @Phone WHERE id = @Id";
+            var query = "UPDATE patient SET name = @Name, last_name = @LastName, address = @Address, birth_date = @BirthDate, gender = @Gender, cpf = @CPF, email = @Email, phone = @Phone WHERE id = @Id";
 
             await connection.ExecuteAsync(query, new
             {
                 Name = newName,
                 LastName = newLastName,
-                Password = newPassword,
                 Address = newAddress,
                 BirthDate = newBirthDate,
                 Gender = (int)newGender,
+                CPF = newCPF,
                 Email = newEmail,
                 Phone = newPhone,
                 Id = id
             });
         }
-        public async Task DeleteAsync(int id)
+        public async Task UpdateStatusAsync(int id, UserStatus status)
         {
             using var connection = _databaseConfig.GetConnection();
-            var query = "DELETE FROM patient WHERE id = @Id";
-            await connection.ExecuteAsync(query, new { Id = id });
+            var query = "UPDATE patient SET status = @Status WHERE id = @Id";
+            await connection.ExecuteAsync(query, new { Id = id, Status = (int)status });
         }
     }
 }

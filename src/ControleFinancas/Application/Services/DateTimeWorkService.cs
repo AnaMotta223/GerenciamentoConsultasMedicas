@@ -3,7 +3,6 @@ using AppointmentsManager.Domain.Entities;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Domain.Interfaces;
 using AppointmentsManager.Domain.Services;
-using AppointmentsManager.Infrastructure.Repositories;
 
 namespace AppointmentsManager.Application.Services
 {

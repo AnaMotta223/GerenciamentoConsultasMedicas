@@ -8,6 +8,7 @@
         public PatientMap()
         {
             Map(d => d.Id).ToColumn("id");
+            Map(d => d.Status).ToColumn("status");
             Map(d => d.Name).ToColumn("name");
             Map(d => d.LastName).ToColumn("last_name");
             Map(d => d.Email).ToColumn("email");

@@ -13,8 +13,9 @@ namespace AppointmentsManager.Domain.Interfaces
         Task<IEnumerable<Doctor>> GetAllAsync();
         Task<IEnumerable<DateTimeWork>> GetDateTimeWork(int id);
         Task<Doctor> AddAsync(Doctor doctor);
-        Task UpdateAsync(int id, string newName, string newLastName, string newPassword, string newAddress, DateTime newBirthDate, Gender newGender, Email newEmail, string newPhone, RMC rmc, Speciality newSpeciality);
+        Task UpdateAsync(int id, string newName, string newLastName, string newAddress, DateTime newBirthDate, Gender newGender, CPF newCPF, Email newEmail, string newPhone, RMC rmc, Speciality newSpeciality);
         Task<IEnumerable<DateTimeWork>> UpdateDateTimeWorkAsync(int id, IEnumerable<DateTimeWork> dateTimeWorkList);
+        Task UpdateStatusAsync(int id, UserStatus status);
         Task DeleteAsync(int id);
     }
 }

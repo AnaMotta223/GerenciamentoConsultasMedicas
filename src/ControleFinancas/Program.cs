@@ -65,8 +65,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("./v1/swagger.json", "com.t2mlab.appointmentmanagerapi.Api v1");
+        c.SwaggerEndpoint("./v1/swagger.json", "com.appointmentmanagerapi.Api v1");
     });
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

@@ -54,14 +54,15 @@ namespace AppointmentsManager.Infrastructure.Repositories
         public async Task<Doctor> AddAsync(Doctor doctor)
         {
             const string query = @"
-            INSERT INTO doctor (name, last_name, email, password, phone, address, birth_date, gender, cpf, rmc, speciality)
-            VALUES (@Name, @LastName, @Email, @Password, @Phone, @Address, @BirthDate, @Gender, @CPF, @RMC, @Speciality)
+            INSERT INTO doctor (status, name, last_name, email, password, phone, address, birth_date, gender, cpf, rmc, speciality)
+            VALUES (@Status, @Name, @LastName, @Email, @Password, @Phone, @Address, @BirthDate, @Gender, @CPF, @RMC, @Speciality)
             RETURNING id;"; 
 
             using var connection = _databaseConfig.GetConnection();
 
             var id = await connection.QuerySingleAsync<int>(query, new
             {
+                doctor.Status,
                 doctor.Name,
                 doctor.LastName,
                 doctor.Email,
@@ -78,21 +79,19 @@ namespace AppointmentsManager.Infrastructure.Repositories
             doctor.Id = id;
             return doctor;
         }
-
-
-        public async Task UpdateAsync(int id, string newName, string newLastName, string newPassword, string newAddress, DateTime newBirthDate, Gender newGender, Email newEmail, string newPhone, RMC rmc, Speciality newSpeciality)
+        public async Task UpdateAsync(int id, string newName, string newLastName, string newAddress, DateTime newBirthDate, Gender newGender, CPF newCPF, Email newEmail, string newPhone, RMC rmc, Speciality newSpeciality)
         {
             using var connection = _databaseConfig.GetConnection();
-            var query = "UPDATE doctor SET name = @Name, last_name = @LastName, password = @Password, address = @Address, birth_date = @BirthDate, gender = @Gender, email = @Email, phone = @Phone, rmc = @RMC, speciality = @Speciality WHERE id = @Id";
+            var query = "UPDATE doctor SET name = @Name, last_name = @LastName, address = @Address, birth_date = @BirthDate, gender = @Gender, cpf = @CPF, email = @Email, phone = @Phone, rmc = @RMC, speciality = @Speciality WHERE id = @Id";
 
             await connection.ExecuteAsync(query, new
             {
                 Name = newName,
                 LastName = newLastName,
-                Password = newPassword,
                 Address = newAddress,
                 BirthDate = newBirthDate,
                 Gender = (int)newGender,
+                CPF = newCPF,
                 Email = newEmail,
                 Phone = newPhone,
                 RMC = rmc,
@@ -119,6 +118,12 @@ namespace AppointmentsManager.Infrastructure.Repositories
                     });
                 }
             return dateTimeWorkList;
+        }
+        public async Task UpdateStatusAsync(int id, UserStatus status)
+        {
+            using var connection = _databaseConfig.GetConnection();
+            var query = "UPDATE doctor SET status = @Status WHERE id = @Id";
+            await connection.ExecuteAsync(query, new { Id = id, Status = (int)status });
         }
         public async Task DeleteAsync(int id)
         {

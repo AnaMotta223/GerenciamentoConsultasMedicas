@@ -11,15 +11,15 @@ namespace AppointmentsManager.Domain.Entities
         public List<DoctorDateTimeWorkResponseDTO> DateTimeWorkList { get; set; } = new();
         public List<Appointment> Appointments { get; set; } = new();
         public Doctor() { }
-        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList)
-         : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
+        public Doctor(UserStatus status, string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList)
+         : base(status, name, lastName, email, password, phone, address, birthDate, gender, cpf)
         {
             RMC = rmc;
             Speciality = speciality;
             DateTimeWorkList = dateTimeWorkList;
         }
-        public Doctor(string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList, List<Appointment> appointments)
-        : base(name, lastName, email, password, phone, address, birthDate, gender, cpf)
+        public Doctor(UserStatus status, string name, string lastName, string password, string address, DateTime birthDate, Gender gender, Email email, string phone, CPF cpf, RMC rmc, Speciality speciality, List<DoctorDateTimeWorkResponseDTO> dateTimeWorkList, List<Appointment> appointments)
+        : base(status, name, lastName, email, password, phone, address, birthDate, gender, cpf)
         {
             Speciality = speciality;
            DateTimeWorkList = dateTimeWorkList;

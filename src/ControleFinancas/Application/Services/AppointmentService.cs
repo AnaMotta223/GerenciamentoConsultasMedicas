@@ -176,17 +176,6 @@ namespace AppointmentsManager.Application.Services
 
             return await MapToAppointmentResponseDTOAsync(appointment);
         }
-        public async Task DeleteAppointmentAsync(int id)
-        {
-            var appointment = await _appointmentRepository.GetByIdAsync(id)
-                         ?? throw new ArgumentException("Consulta não encontrada.");
-
-            if (appointment.AppointmentStatus != AppointmentStatus.CANCELED)
-            {
-                throw new InvalidOperationException("Consultas agendadas ou confirmadas não podem ser deletadas.");
-            }
-            await _appointmentRepository.DeleteAsync(id);
-        }
         private static DoctorDateTimeWorkResponseDTO MapToDoctorDateTimeWorkResponseDTO(DateTimeWork dateTimeWork)
         {
             return new DoctorDateTimeWorkResponseDTO

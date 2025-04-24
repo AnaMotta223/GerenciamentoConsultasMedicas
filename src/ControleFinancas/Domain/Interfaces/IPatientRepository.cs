@@ -11,7 +11,7 @@ namespace AppointmentsManager.Domain.Interfaces
         Task<Patient> GetByIdAsync(int id);
         Task<IEnumerable<Patient>> GetAllAsync();
         Task AddAsync(Patient patient);
-        Task UpdateAsync(int id, string newName, string newLastName, string newPassword, string newAddress, DateTime newBirthDate, Gender newGender, Email newEmail, string newPhone);
-        Task DeleteAsync(int id);
+        Task UpdateAsync(int id, string newName, string newLastName, string newAddress, DateTime newBirthDate, Gender newGender, CPF newCPF, Email newEmail, string newPhone);
+        Task UpdateStatusAsync(int id, UserStatus status);
     }
 }

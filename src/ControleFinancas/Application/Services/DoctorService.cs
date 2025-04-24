@@ -1,5 +1,6 @@
 ﻿using AppointmentsManager.Application.DTOs;
 using AppointmentsManager.Domain.Entities;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Domain.Interfaces;                       
 using AppointmentsManager.Utils;
@@ -47,7 +48,7 @@ namespace AppointmentsManager.Application.Services
                 ?? throw new KeyNotFoundException($"Nenhum médico encontrado com o ID {id}.");
 
             doctor.DateTimeWorkList = schedule
-                .Select(MapToDoctorDateTimeWorkResponseDTO) 
+                .Select(MapToDoctorDateTimeWorkResponseDTO)
                 .ToList();
 
             return MapToDoctorResponseDTO(doctor);
@@ -81,6 +82,7 @@ namespace AppointmentsManager.Application.Services
 
             var doctor = new Doctor
             {
+                Status = UserStatus.ACTIVE,
                 Name = createDoctorDTO.Name,
                 LastName = createDoctorDTO.LastName,
                 Email = createDoctorDTO.Email.ToEmail(),
@@ -92,14 +94,14 @@ namespace AppointmentsManager.Application.Services
                 CPF = createDoctorDTO.CPF.ToCPF(),
                 RMC = createDoctorDTO.RMC.ToRMC(),
                 Speciality = createDoctorDTO.Speciality,
-                DateTimeWorkList = new List<DoctorDateTimeWorkResponseDTO>() 
+                DateTimeWorkList = new List<DoctorDateTimeWorkResponseDTO>()
             };
 
             var createdDoctor = await _doctorRepository.AddAsync(doctor);
 
             foreach (var dateTimeWorkDTO in createDoctorDTO.DateTimeWorkList)
             {
-                if(dateTimeWorkDTO.DayOfWeek <= 0 || dateTimeWorkDTO.DayOfWeek > 7)
+                if (dateTimeWorkDTO.DayOfWeek <= 0 || dateTimeWorkDTO.DayOfWeek > 7)
                 {
                     await _doctorRepository.DeleteAsync(createdDoctor.Id);
                     throw new InvalidDateTimeException("Dia da semana inválido.");
@@ -116,14 +118,15 @@ namespace AppointmentsManager.Application.Services
             return new DoctorResponseDTO
             {
                 Id = doctor.Id,
+                Status = doctor.Status.ToString(),
                 Name = doctor.Name,
                 LastName = doctor.LastName,
                 Email = doctor.Email.ToString(),
                 Phone = doctor.Phone,
                 Address = doctor.Address,
                 BirthDate = doctor.BirthDate.ToString("dd/MM/yyyy"),
-                Gender = doctor.Gender,
-                Speciality = doctor.Speciality,
+                Gender = doctor.Gender.ToString(),
+                Speciality = doctor.Speciality.ToString(),
                 RMC = doctor.RMC.Value,
                 DateTimeWorkList = doctor.DateTimeWorkList ?? new List<DoctorDateTimeWorkResponseDTO>()
             };
@@ -153,7 +156,7 @@ namespace AppointmentsManager.Application.Services
                 ?? throw new KeyNotFoundException($"Nenhum médico encontrado com o ID {id}.");
             var schedule = await _doctorRepository.GetDateTimeWork(id);
 
-            if(schedule == null || !schedule.Any())
+            if (schedule == null || !schedule.Any())
             {
                 throw new ArgumentNullException("Horários de trabalho ainda não informados ou médico de férias.");
             }
@@ -203,10 +206,10 @@ namespace AppointmentsManager.Application.Services
 
             await _doctorRepository.UpdateAsync(id, updateDoctorDTO.Name,
                 updateDoctorDTO.LastName,
-                _passwordEncrypter.HashPassword(updateDoctorDTO.Password),
                 updateDoctorDTO.Address,
                 updateDoctorDTO.BirthDate.ToDateTime(),
                 updateDoctorDTO.Gender,
+                updateDoctorDTO.CPF.ToCPF(),
                 updateDoctorDTO.Email.ToEmail(),
                 updateDoctorDTO.Phone,
                 updateDoctorDTO.RMC.ToRMC(),
@@ -224,14 +227,15 @@ namespace AppointmentsManager.Application.Services
             return new DoctorResponseDTO
             {
                 Id = doctor.Id,
+                Status = doctor.Status.ToString(),
                 Name = updateDoctorDTO.Name,
                 LastName = updateDoctorDTO.LastName,
                 Email = updateDoctorDTO.Email,
                 Phone = updateDoctorDTO.Phone,
                 Address = updateDoctorDTO.Address,
                 BirthDate = updateDoctorDTO.BirthDate,
-                Gender = updateDoctorDTO.Gender,
-                Speciality = updateDoctorDTO.Speciality,
+                Gender = updateDoctorDTO.Gender.ToString(),
+                Speciality = updateDoctorDTO.Speciality.ToString(),
                 RMC = updateDoctorDTO.RMC,
                 DateTimeWorkList = doctor.DateTimeWorkList
             };
@@ -253,7 +257,7 @@ namespace AppointmentsManager.Application.Services
             }
 
             var dateTimeWorkList = updateDoctorScheduleDTO.Select(dto => new DateTimeWork
-            {   
+            {
                 IdDoctor = doctor.Id,
                 DayOfWeek = dto.DayOfWeek,
                 StartTime = dto.StartTime.ToTimeSpan(),
@@ -270,14 +274,31 @@ namespace AppointmentsManager.Application.Services
 
             return dateTimeWorkListDto;
         }
-        public async Task DeleteDoctorAsync(int id)
+        public async Task<DoctorResponseDTO> UpdateStatusAsync(int id, UserStatus status)
         {
             var doctor = await _doctorRepository.GetByIdAsync(id);
             if (doctor == null)
             {
-                throw new ArgumentException("Médico não encontrado.");
+                throw new KeyNotFoundException("Médico não encontrado.");
             }
-            await _doctorRepository.DeleteAsync(id);
+
+            await _doctorRepository.UpdateStatusAsync(id, status);
+
+            return new DoctorResponseDTO
+            {
+                Id = doctor.Id,
+                Status = doctor.Status.ToString(),
+                Name = doctor.Name,
+                LastName = doctor.LastName,
+                Email = doctor.Email.ToString(),
+                Phone = doctor.Phone,
+                Address = doctor.Address,
+                BirthDate = doctor.BirthDate.ToString("dd/MM/yyyy"),
+                Gender = doctor.Gender.ToString(),
+                Speciality = doctor.Speciality.ToString(),
+                RMC = doctor.RMC.Value,
+                DateTimeWorkList = doctor.DateTimeWorkList
+            };
         }
     }
 }

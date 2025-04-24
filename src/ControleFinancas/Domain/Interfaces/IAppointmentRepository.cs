@@ -11,6 +11,5 @@ namespace AppointmentsManager.Domain.Interfaces
         Task<Appointment> AddAsync(Appointment appointment); 
         Task UpdateAsync(int id, DateTime newDateTime, AppointmentStatus newStatus, string? notes);
         Task UpdateStatusAsync(int id, AppointmentStatus newStatus, string? notes);
-        Task DeleteAsync(int id);
     }
 }

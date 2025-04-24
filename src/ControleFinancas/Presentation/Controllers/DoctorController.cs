@@ -1,4 +1,6 @@
 ﻿using AppointmentsManager.Application.Services;
+using AppointmentsManager.Domain.Entities;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Presentation.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -152,14 +154,13 @@ namespace AppointmentsManager.Presentation.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
             }
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDoctor(int id)
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UserStatus status)
         {
             try
             {
-                await _doctorService.DeleteDoctorAsync(id);
-                return NoContent();
+                var doctor = await _doctorService.UpdateStatusAsync(id, status);
+                return Ok(doctor);
             }
             catch (ArgumentException ex)
             {

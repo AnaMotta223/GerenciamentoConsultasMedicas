@@ -1,7 +1,9 @@
 ﻿using AppointmentsManager.Application.DTOs;
 using AppointmentsManager.Domain.Entities;
+using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Domain.Interfaces;
+using AppointmentsManager.Infrastructure.Repositories;
 using AppointmentsManager.Utils;
 
 namespace AppointmentsManager.Application.Services
@@ -21,13 +23,14 @@ namespace AppointmentsManager.Application.Services
             return new PatientResponseDTO
             {
                 Id = patient.Id,
+                Status = patient.Status.ToString(),
                 Name = patient.Name,
                 LastName = patient.LastName,
                 Email = patient.Email.ToString(),
                 Phone = patient.Phone,
                 Address = patient.Address,
                 BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
-                Gender = patient.Gender
+                Gender = patient.Gender.ToString()
             };
         }
         public async Task<IEnumerable<PatientResponseDTO>> ListPatientsAsync()
@@ -62,6 +65,7 @@ namespace AppointmentsManager.Application.Services
             
             var patient = new Patient
             {
+                Status = UserStatus.ACTIVE,
                 Name = createPatientDTO.Name,
                 LastName = createPatientDTO.LastName,
                 Email = createPatientDTO.Email.ToEmail(),
@@ -103,33 +107,49 @@ namespace AppointmentsManager.Application.Services
             }
             await _patientRepository.UpdateAsync(id, updatePatientDTO.Name,
                 updatePatientDTO.LastName,
-                _passwordEncrypter.HashPassword(updatePatientDTO.Password),
                 updatePatientDTO.Address,
                 updatePatientDTO.BirthDate.ToDateTime(),
                 updatePatientDTO.Gender,
+                updatePatientDTO.CPF.ToCPF(),
                 updatePatientDTO.Email.ToEmail(),
                 updatePatientDTO.Phone);
 
             return new PatientResponseDTO
             {
                 Id = patient.Id,
+                Status = patient.Status.ToString(),
                 Name = patient.Name,
                 LastName = patient.LastName,
                 Email = patient.Email.ToString(),
                 Phone = patient.Phone,
                 Address = patient.Address,
                 BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
-                Gender = patient.Gender
+                Gender = patient.Gender.ToString()
             };
         }
-        public async Task DeletePatientAsync(int id)
+        public async Task<PatientResponseDTO> UpdateStatusAsync(int id, UserStatus status)
         {
             var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null)
             {
-                throw new ArgumentException("Paciente não encontrado.");
+                throw new KeyNotFoundException("Paciente não encontrado.");
             }
-            await _patientRepository.DeleteAsync(id);
+
+            await _patientRepository.UpdateStatusAsync(id, status);
+
+            return new PatientResponseDTO
+            {
+                Id = patient.Id,
+                Status = patient.Status.ToString(),
+                Name = patient.Name,
+                LastName = patient.LastName,
+                Email = patient.Email.ToString(),
+                Phone = patient.Phone,
+                Address = patient.Address,
+                BirthDate = patient.BirthDate.ToString("dd/MM/yyyy"),
+                Gender = patient.Gender.ToString()
+            };
         }
+
     }
 }
