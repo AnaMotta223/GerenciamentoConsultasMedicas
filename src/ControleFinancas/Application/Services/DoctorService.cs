@@ -10,11 +10,13 @@ namespace AppointmentsManager.Application.Services
     public class DoctorService
     {
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IPatientRepository _patientRepository;
         private readonly PasswordEncrypter _passwordEncrypter;
         private readonly IDateTimeWorkRepository _dateTimeWorkRepository;
 
-        public DoctorService(IDoctorRepository doctorRepository, PasswordEncrypter passwordEncrypter, IDateTimeWorkRepository dateTimeWorkRepository)
+        public DoctorService(IDoctorRepository doctorRepository, PasswordEncrypter passwordEncrypter, IDateTimeWorkRepository dateTimeWorkRepository, IPatientRepository patientRepository)
         {
+            _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
             _passwordEncrypter = passwordEncrypter;
             _dateTimeWorkRepository = dateTimeWorkRepository;
@@ -71,7 +73,7 @@ namespace AppointmentsManager.Application.Services
             {
                 throw new InvalidPhoneException("Número de telefone inválido.");
             }
-            if (await _doctorRepository.ExistsByCPFAsync(createDoctorDTO.CPF))
+            if (await _doctorRepository.ExistsByCPFAsync(createDoctorDTO.CPF) || await _patientRepository.ExistsByCPFAsync(createDoctorDTO.CPF))
                 throw new InvalidCPFException("CPF já cadastrado.");
 
             if (await _doctorRepository.ExistsByEmailAsync(createDoctorDTO.Email))

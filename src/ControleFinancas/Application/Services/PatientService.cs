@@ -11,10 +11,12 @@ namespace AppointmentsManager.Application.Services
     public class PatientService
     {
         private readonly IPatientRepository _patientRepository;
+        private readonly IDoctorRepository _doctorRepository;
         private readonly PasswordEncrypter _passwordEncrypter;
 
-        public PatientService(IPatientRepository patientRepository, PasswordEncrypter passwordEncrypter)
+        public PatientService(IPatientRepository patientRepository, PasswordEncrypter passwordEncrypter, IDoctorRepository doctorRepository)
         {
+            _doctorRepository = doctorRepository;
             _patientRepository = patientRepository;
             _passwordEncrypter = passwordEncrypter;
         }
@@ -57,7 +59,7 @@ namespace AppointmentsManager.Application.Services
             if (createPatientDTO.BirthDate.ToDateTime() >= DateTime.Now)
                 throw new InvalidDateTimeException("Data de nascimento inválida.");
 
-            if (await _patientRepository.ExistsByCPFAsync(createPatientDTO.CPF))
+            if (await _patientRepository.ExistsByCPFAsync(createPatientDTO.CPF) || await _doctorRepository.ExistsByCPFAsync(createPatientDTO.CPF))
                 throw new InvalidCPFException("CPF já cadastrado.");
 
             if (await _patientRepository.ExistsByEmailAsync(createPatientDTO.Email))
