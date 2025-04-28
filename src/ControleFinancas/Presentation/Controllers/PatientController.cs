@@ -99,11 +99,12 @@ namespace AppointmentsManager.Presentation.Controllers
             }
         }
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UserStatus status)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusModel updateStatusModel)
         {
             try
             {
-                var patient = await _patientService.UpdateStatusAsync(id, status);
+                var statusDTO = updateStatusModel.ToDto();
+                var patient = await _patientService.UpdateStatusAsync(id, statusDTO);
                 return Ok(patient);
             }
             catch (ArgumentException ex)

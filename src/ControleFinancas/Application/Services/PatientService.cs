@@ -3,7 +3,6 @@ using AppointmentsManager.Domain.Entities;
 using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Domain.Interfaces;
-using AppointmentsManager.Infrastructure.Repositories;
 using AppointmentsManager.Utils;
 
 namespace AppointmentsManager.Application.Services
@@ -48,22 +47,26 @@ namespace AppointmentsManager.Application.Services
         }
         public async Task<PatientResponseDTO> RegisterPatientAsync(CreatePatientDTO createPatientDTO)
         {
-            if (createPatientDTO.Phone.Length < 8)
+            if (createPatientDTO.Phone.Length < 8 || createPatientDTO.Phone.Length > 11)
             {
-                throw new InvalidPhoneException("Número de telefone inválido.");
+                throw new InvalidPhoneException("Número de telefone inválido. Deve ter no de 8 a 11 dígitos.");
             }
             if (((int)createPatientDTO.Gender) < 0 || ((int)createPatientDTO.Gender) > 3)
             {
                 throw new InvalidEnumNumberException("Gênero inválido. Valor não encontrado.");
             }
             if (createPatientDTO.BirthDate.ToDateTime() >= DateTime.Now)
-                throw new InvalidDateTimeException("Data de nascimento inválida.");
-
+            {
+                throw new InvalidDateTimeException("Data de nascimento inválida: A data de nascimento não pode ser no futuro.");
+            }
             if (await _patientRepository.ExistsByCPFAsync(createPatientDTO.CPF) || await _doctorRepository.ExistsByCPFAsync(createPatientDTO.CPF))
+            {
                 throw new InvalidCPFException("CPF já cadastrado.");
-
-            if (await _patientRepository.ExistsByEmailAsync(createPatientDTO.Email))
+            }
+            if (await _patientRepository.ExistsByEmailAsync(createPatientDTO.Email) || await _doctorRepository.ExistsByEmailAsync(createPatientDTO.Email)) 
+            {
                 throw new InvalidEmailException("Email já cadastrado.");
+            }
             
             var patient = new Patient
             {
@@ -91,9 +94,9 @@ namespace AppointmentsManager.Application.Services
             {
                 throw new ArgumentException("Paciente não encontrado.");
             }
-            if (updatePatientDTO.Phone.Length < 8)
+            if (updatePatientDTO.Phone.Length < 8 || updatePatientDTO.Phone.Length > 11)
             {
-                throw new InvalidPhoneException("Número de telefone inválido.");
+                throw new InvalidPhoneException("Número de telefone inválido. Deve ter de 8 a 11 dígitos.");
             }
             if (((int)updatePatientDTO.Gender) < 0 || ((int)updatePatientDTO.Gender) > 3)
             {
@@ -101,7 +104,7 @@ namespace AppointmentsManager.Application.Services
             }
             if (updatePatientDTO.BirthDate.ToDateTime() >= DateTime.Now)
             {
-                throw new InvalidDateTimeException("Data de nascimento inválida.");
+                throw new InvalidDateTimeException("Data de nascimento inválida: A data de nascimento não pode ser no futuro.");
             }
             if (patients.Any(p => p.Email.Equals(updatePatientDTO.Email)))
             {
@@ -129,7 +132,7 @@ namespace AppointmentsManager.Application.Services
                 Gender = patient.Gender.ToString()
             };
         }
-        public async Task<PatientResponseDTO> UpdateStatusAsync(int id, UserStatus status)
+        public async Task<PatientResponseDTO> UpdateStatusAsync(int id, UpdateStatusDTO updateStatusDTO)
         {
             var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null)
@@ -137,12 +140,12 @@ namespace AppointmentsManager.Application.Services
                 throw new KeyNotFoundException("Paciente não encontrado.");
             }
 
-            await _patientRepository.UpdateStatusAsync(id, status);
+            await _patientRepository.UpdateStatusAsync(id, updateStatusDTO.Status);
 
             return new PatientResponseDTO
             {
                 Id = patient.Id,
-                Status = patient.Status.ToString(),
+                Status = updateStatusDTO.Status.ToString(),
                 Name = patient.Name,
                 LastName = patient.LastName,
                 Email = patient.Email.ToString(),

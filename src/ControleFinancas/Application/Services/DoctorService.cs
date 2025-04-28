@@ -57,9 +57,13 @@ namespace AppointmentsManager.Application.Services
         }
         public async Task<DoctorResponseDTO> RegisterDoctorAsync(CreateDoctorDTO createDoctorDTO)
         {
-            if (createDoctorDTO.BirthDate.ToDateTime() >= DateTime.Now || (DateTime.Now.Year - createDoctorDTO.BirthDate.ToDateTime().Year < 18))
+            if (createDoctorDTO.BirthDate.ToDateTime() >= DateTime.Now)
             {
-                throw new InvalidDateTimeException("Data de nascimento inválida.");
+                throw new InvalidDateTimeException("Data de nascimento inválida: A data de nascimento não pode ser no futuro.");
+            }
+            if ((DateTime.Now.Year - createDoctorDTO.BirthDate.ToDateTime().Year) < 18 || (DateTime.Now.Year - createDoctorDTO.BirthDate.ToDateTime().Year) == 18 && (((DateTime.Now.Month == createDoctorDTO.BirthDate.ToDateTime().Month) && (DateTime.Now.Day < createDoctorDTO.BirthDate.ToDateTime().Day)) || DateTime.Now.Month < createDoctorDTO.BirthDate.ToDateTime().Month))
+            {
+                throw new InvalidDateTimeException("Data de nascimento inválida: A idade não pode ser menor que 18 anos");
             }
             if (((int)createDoctorDTO.Gender) < 0 || ((int)createDoctorDTO.Gender) > 3)
             {
@@ -69,18 +73,22 @@ namespace AppointmentsManager.Application.Services
             {
                 throw new InvalidEnumNumberException("Especialidade inválida. Valor não encontrado.");
             }
-            if (createDoctorDTO.Phone.Length < 8)
+            if (createDoctorDTO.Phone.Length < 8 || createDoctorDTO.Phone.Length > 11)
             {
-                throw new InvalidPhoneException("Número de telefone inválido.");
+                throw new InvalidPhoneException("Número de telefone inválido. Deve ter de 8 a 11 dígitos.");
             }
             if (await _doctorRepository.ExistsByCPFAsync(createDoctorDTO.CPF) || await _patientRepository.ExistsByCPFAsync(createDoctorDTO.CPF))
+            {
                 throw new InvalidCPFException("CPF já cadastrado.");
-
-            if (await _doctorRepository.ExistsByEmailAsync(createDoctorDTO.Email))
+            }
+            if (await _doctorRepository.ExistsByEmailAsync(createDoctorDTO.Email) || await _patientRepository.ExistsByEmailAsync(createDoctorDTO.Email))
+            {
                 throw new InvalidEmailException("Email já cadastrado.");
-
+            }
             if (await _doctorRepository.ExistsByRMCAsync(createDoctorDTO.RMC))
+            {
                 throw new InvalidRMCException("CRM já cadastrado.");
+            }
 
             var doctor = new Doctor
             {
@@ -175,15 +183,14 @@ namespace AppointmentsManager.Application.Services
         public async Task<DoctorResponseDTO> UpdateDoctorAsync(int id, UpdateDoctorDTO updateDoctorDTO)
         {
             var doctor = await _doctorRepository.GetByIdAsync(id);
-            var doctors = await _doctorRepository.GetAllAsync();
 
             if (doctor == null)
             {
                 throw new ArgumentException("Médico não encontrado.");
             }
-            if (updateDoctorDTO.Phone.Length < 8)
+            if (updateDoctorDTO.Phone.Length < 8 || updateDoctorDTO.Phone.Length > 11)
             {
-                throw new InvalidPhoneException("Número de telefone inválido.");
+                throw new InvalidPhoneException("Número de telefone inválido. Deve ter de 8 a 11 dígitos.");
             }
             if (((int)updateDoctorDTO.Gender) < 0 || ((int)updateDoctorDTO.Gender) > 3)
             {
@@ -193,17 +200,25 @@ namespace AppointmentsManager.Application.Services
             {
                 throw new InvalidEnumNumberException("Especialidade inválida. Valor não encontrado.");
             }
-            if (updateDoctorDTO.BirthDate.ToDateTime() >= DateTime.Now || (DateTime.Now.Year - updateDoctorDTO.BirthDate.ToDateTime().Year < 18))
+            if (updateDoctorDTO.BirthDate.ToDateTime() >= DateTime.Now)
             {
-                throw new InvalidDateTimeException("Data de nascimento inválida.");
+                throw new InvalidDateTimeException("Data de nascimento inválida: A data de nascimento não pode ser no futuro.");
             }
-            if (doctors.Any(a => a.Email.Equals(updateDoctorDTO.Email)))
+            if ((DateTime.Now.Year - updateDoctorDTO.BirthDate.ToDateTime().Year) < 18 || (DateTime.Now.Year - updateDoctorDTO.BirthDate.ToDateTime().Year) == 18 && (((DateTime.Now.Month == updateDoctorDTO.BirthDate.ToDateTime().Month) && (DateTime.Now.Day < updateDoctorDTO.BirthDate.ToDateTime().Day)) || DateTime.Now.Month < updateDoctorDTO.BirthDate.ToDateTime().Month))
             {
-                throw new InvalidEmailException("Email já cadastrado.");
+                throw new InvalidDateTimeException("Data de nascimento inválida: A idade não pode ser menor que 18 anos");
             }
-            if (doctors.Any(a => a.RMC == updateDoctorDTO.RMC.ToRMC()))
+            if (await _doctorRepository.ExistsByRMCAsync(updateDoctorDTO.RMC))
             {
                 throw new InvalidRMCException("CRM já cadastrado.");
+            }
+            if ((await _doctorRepository.ExistsByCPFAsync(updateDoctorDTO.CPF)) || (await _patientRepository.ExistsByCPFAsync(updateDoctorDTO.CPF)))
+            {
+                throw new InvalidCPFException("CPF já cadastrado.");
+            }
+            if (await _doctorRepository.ExistsByEmailAsync(updateDoctorDTO.Email) || await _patientRepository.ExistsByEmailAsync(updateDoctorDTO.Email))
+            {
+                throw new InvalidEmailException("Email já cadastrado.");
             }
 
             await _doctorRepository.UpdateAsync(id, updateDoctorDTO.Name,
@@ -276,7 +291,7 @@ namespace AppointmentsManager.Application.Services
 
             return dateTimeWorkListDto;
         }
-        public async Task<DoctorResponseDTO> UpdateStatusAsync(int id, UserStatus status)
+        public async Task<DoctorResponseDTO> UpdateStatusAsync(int id, UpdateStatusDTO updateStatusDTO)
         {
             var doctor = await _doctorRepository.GetByIdAsync(id);
             if (doctor == null)
@@ -284,12 +299,12 @@ namespace AppointmentsManager.Application.Services
                 throw new KeyNotFoundException("Médico não encontrado.");
             }
 
-            await _doctorRepository.UpdateStatusAsync(id, status);
+            await _doctorRepository.UpdateStatusAsync(id, updateStatusDTO.Status);
 
             return new DoctorResponseDTO
             {
                 Id = doctor.Id,
-                Status = doctor.Status.ToString(),
+                Status = updateStatusDTO.Status.ToString(),
                 Name = doctor.Name,
                 LastName = doctor.LastName,
                 Email = doctor.Email.ToString(),
