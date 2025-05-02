@@ -48,7 +48,23 @@ namespace AppointmentsManager.Presentation.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
             }
         }
-
+        [HttpGet("with-status/{status}")]
+        public async Task<IActionResult> GetPatientsByStatus(UserStatus status)
+        {
+            try
+            {
+                var patients = await _patientService.SearchByStatusAsync(status);
+                return Ok(patients);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor.", details = ex.Message });
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreatePatient([FromBody] CreatePatientModel createPatientModel)
         {

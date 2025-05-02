@@ -17,7 +17,7 @@ namespace AppointmentsManager.Application.Services
             _availabilityService = availabilityService;
             _doctorRepository = doctorRepository;
         }
-        public async Task<IEnumerable<DateTimeWork>> ListPatientsAsync()
+        public async Task<IEnumerable<DateTimeWork>> ListSchedulesAsync()
         {
             return await _dateTimeWorkRepository.GetAllAsync();
         }

@@ -3,6 +3,7 @@ using AppointmentsManager.Domain.Entities;
 using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
 using AppointmentsManager.Domain.Interfaces;
+using AppointmentsManager.Infrastructure.Repositories;
 using AppointmentsManager.Utils;
 
 namespace AppointmentsManager.Application.Services
@@ -44,6 +45,15 @@ namespace AppointmentsManager.Application.Services
             var patient = await _patientRepository.GetByIdAsync(id)
                           ?? throw new KeyNotFoundException($"Nenhum paciente encontrado com o ID {id}.");
             return MapToPatientResponseDTO(patient);
+        }
+        public async Task<IEnumerable<PatientResponseDTO>> SearchByStatusAsync(UserStatus status)
+        {
+            var patients = await _patientRepository.GetByStatusAsync(status);
+            if ((int)status < 0 || (int)status > 2)
+            {
+                throw new InvalidEnumNumberException("O status informado não existe.");
+            }
+            return patients.Select(patient => MapToPatientResponseDTO(patient));
         }
         public async Task<PatientResponseDTO> RegisterPatientAsync(CreatePatientDTO createPatientDTO)
         {
@@ -138,6 +148,10 @@ namespace AppointmentsManager.Application.Services
             if (patient == null)
             {
                 throw new KeyNotFoundException("Paciente não encontrado.");
+            }
+            if ((int)updateStatusDTO.Status < 0 || (int)updateStatusDTO.Status > 2)
+            {
+                throw new InvalidEnumNumberException("Status inválido. Valor não encontrado.");
             }
 
             await _patientRepository.UpdateStatusAsync(id, updateStatusDTO.Status);

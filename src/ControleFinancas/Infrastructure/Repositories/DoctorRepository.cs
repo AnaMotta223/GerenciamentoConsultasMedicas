@@ -27,6 +27,12 @@ namespace AppointmentsManager.Infrastructure.Repositories
             const string query = "SELECT * FROM doctor WHERE id = @Id";
             return await connection.QuerySingleOrDefaultAsync<Doctor>(query, new { Id = id });
         }
+        public async Task<IEnumerable<Doctor>> GetByStatusAsync(UserStatus status)
+        {
+            using var connection = _databaseConfig.GetConnection();
+            var query = "SELECT * FROM doctor WHERE status = @Status";
+            return await connection.QueryAsync<Doctor>(query, new { Status = status });
+        }
         public async Task<IEnumerable<DateTimeWork>> GetDateTimeWork(int id)
         {
             using var connection = _databaseConfig.GetConnection();

@@ -39,6 +39,12 @@ namespace AppointmentsManager.Infrastructure.Repositories
             const string query = "SELECT 1 FROM patient WHERE email = @Email";
             return await connection.ExecuteScalarAsync<bool>(query, new { Email = email });
         }
+        public async Task<IEnumerable<Patient>> GetByStatusAsync(UserStatus status)
+        {
+            using var connection = _databaseConfig.GetConnection();
+            var query = "SELECT * FROM patient WHERE status = @Status";
+            return await connection.QueryAsync<Patient>(query, new { Status = status });
+        }
         public async Task AddAsync(Patient patient)
         {
             using var connection = _databaseConfig.GetConnection();

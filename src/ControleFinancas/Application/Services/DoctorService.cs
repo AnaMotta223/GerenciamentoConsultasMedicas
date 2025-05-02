@@ -2,7 +2,8 @@
 using AppointmentsManager.Domain.Entities;
 using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Exceptions;
-using AppointmentsManager.Domain.Interfaces;                       
+using AppointmentsManager.Domain.Interfaces;
+using AppointmentsManager.Domain.Services;
 using AppointmentsManager.Utils;
 
 namespace AppointmentsManager.Application.Services
@@ -13,13 +14,15 @@ namespace AppointmentsManager.Application.Services
         private readonly IPatientRepository _patientRepository;
         private readonly PasswordEncrypter _passwordEncrypter;
         private readonly IDateTimeWorkRepository _dateTimeWorkRepository;
+        private readonly AvailabilityService _availabilityService;
 
-        public DoctorService(IDoctorRepository doctorRepository, PasswordEncrypter passwordEncrypter, IDateTimeWorkRepository dateTimeWorkRepository, IPatientRepository patientRepository)
+        public DoctorService(IDoctorRepository doctorRepository, PasswordEncrypter passwordEncrypter, IDateTimeWorkRepository dateTimeWorkRepository, IPatientRepository patientRepository, AvailabilityService availabilityService)
         {
             _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
             _passwordEncrypter = passwordEncrypter;
             _dateTimeWorkRepository = dateTimeWorkRepository;
+            _availabilityService = availabilityService;
         }
         public async Task<IEnumerable<DoctorResponseDTO>> ListDoctorsAsync()
         {
@@ -54,6 +57,30 @@ namespace AppointmentsManager.Application.Services
                 .ToList();
 
             return MapToDoctorResponseDTO(doctor);
+        }
+        public async Task<IEnumerable<DoctorResponseDTO>> SearchByStatusAsync(UserStatus status)
+        {
+            var doctors = await _doctorRepository.GetByStatusAsync(status);
+            var schedules = await _dateTimeWorkRepository.GetAllAsync();
+            if ((int)status < 0 || (int)status > 2)
+            {
+                throw new InvalidEnumNumberException("O status informado não existe.");
+            }
+            
+            var schedulesByDoctorId = schedules
+                .GroupBy(schedule => schedule.IdDoctor)
+                .ToDictionary(group => group.Key, group => group.Select(MapToDoctorDateTimeWorkResponseDTO).ToList());
+
+            var doctorDtos = doctors.Select(doctor =>
+            {
+                doctor.DateTimeWorkList = schedulesByDoctorId.TryGetValue(doctor.Id, out var doctorSchedules)
+                    ? doctorSchedules
+                    : new List<DoctorDateTimeWorkResponseDTO>();
+
+                return MapToDoctorResponseDTO(doctor);
+            });
+
+            return doctorDtos;
         }
         public async Task<DoctorResponseDTO> RegisterDoctorAsync(CreateDoctorDTO createDoctorDTO)
         {
@@ -240,7 +267,6 @@ namespace AppointmentsManager.Application.Services
                 doctor.DateTimeWorkList.Add(dateTimeWork);
             }
 
-
             return new DoctorResponseDTO
             {
                 Id = doctor.Id,
@@ -267,9 +293,9 @@ namespace AppointmentsManager.Application.Services
 
             foreach (var dateTimeWorkDTO in updateDoctorScheduleDTO)
             {
-                if (dateTimeWorkDTO.DayOfWeek <= 0 || dateTimeWorkDTO.DayOfWeek > 7)
+                if (!_availabilityService.IsDateTimeValid(dateTimeWorkDTO.DayOfWeek, dateTimeWorkDTO.StartTime.ToTimeSpan(), dateTimeWorkDTO.EndTime.ToTimeSpan()))
                 {
-                    throw new InvalidDateTimeException("Dia da semana inválido.");
+                    throw new InvalidDateTimeException("Dia ou horário inválidos.");
                 }
             }
 
@@ -297,6 +323,10 @@ namespace AppointmentsManager.Application.Services
             if (doctor == null)
             {
                 throw new KeyNotFoundException("Médico não encontrado.");
+            }
+            if((int)updateStatusDTO.Status < 0 ||(int)updateStatusDTO.Status > 2)
+            {
+                throw new InvalidEnumNumberException("Status inválido. Valor não encontrado.");
             }
 
             await _doctorRepository.UpdateStatusAsync(id, updateStatusDTO.Status);

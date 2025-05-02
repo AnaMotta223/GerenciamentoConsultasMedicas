@@ -14,7 +14,7 @@ namespace AppointmentsManager.Application.DTOs
 
         [SwaggerSchema(Format = "date-time", Description = "Data e hora da consulta no formato dd/MM/yyyy HH:mm")]
         public string DateTimeAppointment { get; set; }
-        public AppointmentStatus AppointmentStatus { get; set; }
+        public string AppointmentStatus { get; set; }
         public string Notes { get; set; }
     }
 }

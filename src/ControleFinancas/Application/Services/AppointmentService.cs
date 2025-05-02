@@ -40,7 +40,7 @@ namespace AppointmentsManager.Application.Services
                 PatientName = patient.Name,
                 PatientLastName = patient.LastName,
                 DateTimeAppointment = appointment.DateTimeAppointment.ToString("dd/MM/yyyy HH:mm"),
-                AppointmentStatus = appointment.AppointmentStatus,
+                AppointmentStatus = appointment.AppointmentStatus.ToString(),
                 Notes = appointment.Notes
             };
         }
