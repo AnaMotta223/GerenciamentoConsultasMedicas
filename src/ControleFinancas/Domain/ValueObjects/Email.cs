@@ -1,5 +1,4 @@
 ﻿using AppointmentsManager.Domain.Exceptions;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace AppointmentsManager.Domain.ValueObjects

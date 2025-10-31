@@ -3,7 +3,6 @@ using AppointmentsManager.Domain.Enums;
 using AppointmentsManager.Domain.Interfaces;
 using AppointmentsManager.Infrastructure.Configuration;
 using Dapper;
-using System.Numerics;
 
 namespace AppointmentsManager.Infrastructure.Repositories
 {

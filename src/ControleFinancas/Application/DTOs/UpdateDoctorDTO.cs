@@ -1,5 +1,4 @@
 ﻿using AppointmentsManager.Domain.Enums;
-using AppointmentsManager.Domain.ValueObjects;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 

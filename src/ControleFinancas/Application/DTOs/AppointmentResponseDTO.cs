@@ -1,6 +1,4 @@
-﻿using AppointmentsManager.Domain.Enums;
-using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
+﻿using Swashbuckle.AspNetCore.Annotations;
 
 namespace AppointmentsManager.Application.DTOs
 {
